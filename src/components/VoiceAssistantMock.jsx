@@ -20,7 +20,7 @@ export default function VoiceAssistantMock() {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
     if (!query.trim()) return;
 
@@ -28,7 +28,30 @@ export default function VoiceAssistantMock() {
     const userQuery = query.toLowerCase();
     setQuery('');
 
-    // Simulate network delay
+    // If API key is available, use Gemini API
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    
+    if (apiKey) {
+      try {
+        const { GoogleGenAI } = await import('@google/genai');
+        const ai = new GoogleGenAI({ apiKey });
+        
+        const systemPrompt = "You are a helpful, expert AI assistant for the Indian elections. Provide short, concise answers regarding voter registration, eligibility, and polling processes. Be friendly and supportive. Keep responses under 3 sentences.";
+        
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: `${systemPrompt}\n\nUser: ${userQuery}`
+        });
+
+        setMessages(prev => [...prev, { role: 'assistant', text: response.text }]);
+        return;
+      } catch (error) {
+        console.error("Gemini API Error:", error);
+        // Fallback to mock if API fails
+      }
+    }
+
+    // Fallback to offline mock engine
     setTimeout(() => {
       // Find intention
       let bestMatch = null;
