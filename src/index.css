@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: theme('colors.blue.600');
+  --color-secondary: theme('colors.slate.900');
+}
+
+@layer utilities {
+  .focus-ring {
+    @apply outline-none ring-2 ring-primary ring-offset-2;
+  }
+}
+
+body {
+  @apply bg-gray-50 text-gray-900 antialiased font-sans transition-colors duration-200;
+}
+
+/* High contrast mode overrides */
+.high-contrast {
+  @apply bg-black text-white;
+}
+.high-contrast * {
+  border-color: #facc15 !important;
+}
